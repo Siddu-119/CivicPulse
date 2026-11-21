@@ -1,0 +1,15 @@
+{
+  "name": "civicpulse",
+  "version": "2.0.0",
+  "private": true,
+  "description": "CivicPulse — Smart City Civic Complaint Management Platform",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "mock-server": "npx tsx tools/preview-server.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}
