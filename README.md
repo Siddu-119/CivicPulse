@@ -2,7 +2,7 @@
 
 > **Tagline:** Report. Track. Resolve. Empowering Responsive Urban Governance.
 > **Evaluation:** Round 2 Hackathon Evaluation Submission
-> **Live Web Application:** [https://civic-pulse-ruby-nine.vercel.app/](https://civic-pulse-ruby-nine.vercel.app/)
+> **Live Web Application:** [https://civic-pulse-ruby-nine.vercel.app/](https://civicpulse-governance.vercel.app)
 > **Live API Backend:** [https://civicpulse-backend-pill.onrender.com](https://civicpulse-backend-pill.onrender.com)
 > **Backend Health Check:** [https://civicpulse-backend-pill.onrender.com/api/health](https://civicpulse-backend-pill.onrender.com/api/health)
 > **Source Repository:** [https://github.com/Siddu-119/CivicPulse](https://github.com/Siddu-119/CivicPulse)
