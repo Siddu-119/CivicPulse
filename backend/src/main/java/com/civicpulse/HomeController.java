@@ -17,8 +17,12 @@ public class HomeController {
         );
     }
 
-    @GetMapping("/api/health")
-    public Map<String, String> health() {
-        return Map.of("status", "UP");
+    @GetMapping(value = {"/api/health", "/health", "/healthz"})
+    public Map<String, Object> health() {
+        return Map.of(
+            "status", "UP",
+            "service", "CivicPulse Backend",
+            "timestamp", System.currentTimeMillis()
+        );
     }
 }

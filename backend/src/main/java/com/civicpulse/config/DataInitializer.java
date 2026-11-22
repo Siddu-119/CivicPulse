@@ -6,16 +6,25 @@ import com.civicpulse.repository.ComplaintRepository;
 import com.civicpulse.repository.FeedbackRepository;
 import com.civicpulse.repository.UserRepository;
 import com.civicpulse.service.NotificationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
+    private static final String DEFAULT_DEV_ADMIN_PASS = "Admin@12345";
+    private static final String DEFAULT_DEV_ADMIN_EMAIL = "admin@civicpulse.gov";
+    private static final int MIN_PROD_PASSWORD_LENGTH = 16;
 
     private final UserRepository userRepository;
     private final ComplaintRepository complaintRepository;
@@ -23,8 +32,11 @@ public class DataInitializer implements CommandLineRunner {
     private final FeedbackRepository feedbackRepository;
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
+    private final Environment environment;
     private final String adminEmail;
     private final String adminPassword;
+    private final boolean requireSecurePassword;
+    private final boolean seedSampleData;
 
     public DataInitializer(
             UserRepository userRepository,
@@ -33,8 +45,11 @@ public class DataInitializer implements CommandLineRunner {
             FeedbackRepository feedbackRepository,
             NotificationService notificationService,
             PasswordEncoder passwordEncoder,
+            Environment environment,
             @Value("${app.admin.email:}") String adminEmail,
-            @Value("${app.admin.password:}") String adminPassword
+            @Value("${app.admin.password:}") String adminPassword,
+            @Value("${app.admin.require-secure-password:false}") boolean requireSecurePassword,
+            @Value("${app.seed.sample-data:true}") boolean seedSampleData
     ) {
         this.userRepository = userRepository;
         this.complaintRepository = complaintRepository;
@@ -42,29 +57,43 @@ public class DataInitializer implements CommandLineRunner {
         this.feedbackRepository = feedbackRepository;
         this.notificationService = notificationService;
         this.passwordEncoder = passwordEncoder;
+        this.environment = environment;
         this.adminEmail = adminEmail;
         this.adminPassword = adminPassword;
+        this.requireSecurePassword = requireSecurePassword;
+        this.seedSampleData = seedSampleData;
     }
 
     @Override
     public void run(String... args) {
+        boolean isProduction = isProductionEnvironment();
+        String effectiveAdminPass = resolveAdminPassword(isProduction);
         String adminNormalized = (adminEmail != null && !adminEmail.isBlank())
-                ? adminEmail.trim().toLowerCase()
-                : "admin@civicpulse.gov";
-        String adminPass = (adminPassword != null && !adminPassword.isBlank())
-                ? adminPassword
-                : "Admin@12345";
+                ? adminEmail.trim().toLowerCase(Locale.ROOT)
+                : DEFAULT_DEV_ADMIN_EMAIL;
 
+        // 1. Idempotent Admin Initialization
+        // Note: If an admin already exists in the database, existing credentials are not overwritten.
         User admin = userRepository.findByEmail(adminNormalized).orElseGet(() -> {
             User u = new User();
             u.setFullName("Municipal Operations Director");
             u.setEmail(adminNormalized);
-            u.setPassword(passwordEncoder.encode(adminPass));
+            u.setPassword(passwordEncoder.encode(effectiveAdminPass));
             u.setWard("Central Municipal HQ");
             u.setRole(Role.ADMIN);
+            log.info("Initialized default municipal administrator account for: {}", adminNormalized);
             return userRepository.save(u);
         });
 
+        // 2. Demo & Sample Data Seeding Guard
+        if (!seedSampleData) {
+            log.info("Sample demo data seeding is disabled (SEED_SAMPLE_DATA=false). Clean database state maintained.");
+            return;
+        }
+
+        log.warn("[SECURITY NOTICE] Demo data seeding is enabled (SEED_SAMPLE_DATA=true). A demo citizen account (citizen@civicpulse.org) will be accessible for demonstration.");
+
+        // 3. Demo Citizen Seeding (Only when seedSampleData == true)
         String citizenEmail = "citizen@civicpulse.org";
         User citizen = userRepository.findByEmail(citizenEmail).orElseGet(() -> {
             User c = new User();
@@ -77,9 +106,44 @@ public class DataInitializer implements CommandLineRunner {
             return userRepository.save(c);
         });
 
+        // 4. Sample Complaints Seeding (Only when table is empty)
         if (complaintRepository.count() == 0) {
             seedSampleComplaints(admin, citizen);
+            log.info("Seeded 5 sample complaints for demonstration/evaluation experience.");
         }
+    }
+
+    private boolean isProductionEnvironment() {
+        return requireSecurePassword || environment.matchesProfiles("prod", "production");
+    }
+
+    private String resolveAdminPassword(boolean isProduction) {
+        boolean hasCustomPass = (adminPassword != null && !adminPassword.isBlank());
+        boolean isDefaultPass = hasCustomPass && DEFAULT_DEV_ADMIN_PASS.equals(adminPassword.trim());
+
+        if (isProduction) {
+            if (!hasCustomPass || isDefaultPass) {
+                throw new IllegalStateException(
+                    "CRITICAL SECURITY CONFIGURATION ERROR: In production mode, an explicit, secure ADMIN_PASSWORD must be configured. " +
+                    "Using a blank password or the default development password is strictly prohibited. Application startup aborted."
+                );
+            }
+            if (adminPassword.trim().length() < MIN_PROD_PASSWORD_LENGTH) {
+                throw new IllegalStateException(
+                    "CRITICAL SECURITY CONFIGURATION ERROR: The configured production ADMIN_PASSWORD is too short. " +
+                    "It must be at least " + MIN_PROD_PASSWORD_LENGTH + " characters long. Application startup aborted."
+                );
+            }
+            return adminPassword.trim();
+        }
+
+        // Local Development Mode
+        if (hasCustomPass && !isDefaultPass) {
+            return adminPassword.trim();
+        }
+
+        log.warn("[SECURITY NOTICE] Local development mode active: Using default administrator credentials. For production deployment, set SPRING_PROFILES_ACTIVE=prod and configure a secure ADMIN_PASSWORD (min 16 chars).");
+        return DEFAULT_DEV_ADMIN_PASS;
     }
 
     private void seedSampleComplaints(User admin, User citizen) {

@@ -1,0 +1,45 @@
+# ==============================================================================
+# Render Blueprint — CivicPulse Backend Free Tier Web Service
+# ==============================================================================
+services:
+  - type: web
+    name: civicpulse-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    region: oregon
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: REQUIRE_SECURE_ADMIN_PASSWORD
+        value: "true"
+      # Set to 'true' for hackathon evaluation demo; set to 'false' for clean production
+      - key: SEED_SAMPLE_DATA
+        value: "true"
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JPA_DDL_AUTO
+        value: validate
+      - key: SQL_INIT_MODE
+        value: never
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION_MS
+        value: 86400000
+      - key: ADMIN_EMAIL
+        value: admin@civicpulse.gov
+      # Secret environment variable (minimum 16 characters, must be unique production secret)
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: UPLOAD_DIR
+        value: uploads

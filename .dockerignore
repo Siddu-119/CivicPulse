@@ -1,0 +1,17 @@
+# Root Docker ignore rules
+.git/
+.gitignore
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
+backend/target/
+frontend/node_modules/
+frontend/dist/
+uploads/
+backend/uploads/
+*.log
+startup-error.txt
+.backup_v1/
