@@ -39,7 +39,7 @@ export function resolveAssetUrl(path?: string | null): string | undefined {
 
 const http = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  timeout: 60000,
 });
 
 http.interceptors.request.use((config) => {
@@ -52,6 +52,14 @@ http.interceptors.request.use((config) => {
 
 function extractError(err: unknown): never {
   if (axios.isAxiosError(err)) {
+    if (
+      err.code === 'ECONNABORTED' ||
+      (err.message && err.message.toLowerCase().includes('timeout'))
+    ) {
+      throw new Error(
+        'Connection timed out while waiting for server response. The service may be waking up from sleep. Please wait a moment and try again.'
+      );
+    }
     const serverMessage =
       (err.response?.data as { error?: string; message?: string } | undefined)?.error ||
       (err.response?.data as { message?: string } | undefined)?.message;

@@ -1,0 +1,68 @@
+# CivicPulse V2 — Official Hackathon Demonstration Narration Script
+Project: CivicPulse V2
+Target Duration: 3 minutes 35 seconds (215 seconds)
+Live Frontend: https://civicpulse-governance.vercel.app/
+Live Backend: https://civicpulse-backend-pill.onrender.com
+GitHub: https://github.com/Siddu-119/CivicPulse
+
+================================================================================
+[Opening — 0:00 - 0:15]
+"Cities face everyday challenges: damaged roads, overflowing waste, waterlogging, and public infrastructure problems. But reporting these issues and ensuring they reach the right authorities can be difficult.
+
+Introducing CivicPulse V2 — a smart civic complaint and resolution platform designed to connect citizens with municipal authorities."
+
+================================================================================
+[Platform overview — 0:15 - 0:40]
+"CivicPulse provides a centralized digital platform where citizens can report civic problems, follow complaint progress, and view reported issues through an interactive map.
+
+Its goal is simple: make civic issue reporting more accessible, transparent, and organized."
+
+================================================================================
+[Citizen experience — 0:40 - 1:10]
+"Citizens can access the platform through its authentication system and their personal dashboard.
+
+The dashboard provides an overview of reported complaints and their statuses, helping citizens keep track of the issues they have raised."
+
+================================================================================
+[Smart classification — 1:10 - 1:50]
+"One of CivicPulse's key features is its rule-based smart classification system.
+
+When a civic issue is described, the system analyzes relevant keywords and patterns to identify its category, estimate priority, and recommend the appropriate department.
+
+For example, a report describing a hazardous pothole can be classified under roads and potholes, with high priority and a suggested department.
+
+This helps organize incoming complaints and supports more consistent routing."
+
+================================================================================
+[Interactive map — 1:50 - 2:20]
+"CivicPulse also includes an interactive map powered by Leaflet and OpenStreetMap.
+
+Citizens and administrators can explore the geographic distribution of civic issues and view complaint markers and categories.
+
+This location-based view helps make reported problems easier to understand."
+
+================================================================================
+[Complaint tracking — 2:20 - 2:50]
+"Transparency is another important part of the platform.
+
+Through the public tracking portal, users can check complaint progress using a tracking code without needing to navigate the entire dashboard.
+
+The platform also supports complaint updates, notifications, and citizen feedback."
+
+================================================================================
+[Administration — 2:50 - 3:15]
+"On the administrative side, CivicPulse provides tools for reviewing complaints, assigning them to the appropriate workflow, monitoring resolution status, and viewing analytics.
+
+These capabilities are part of the implemented application. This demonstration presents the administrative workflow using verified project evidence."
+
+================================================================================
+[Technology and closing — 3:15 - 3:35]
+"CivicPulse V2 is built using React, TypeScript, Java, Spring Boot, Spring Security, JWT authentication, and TiDB Cloud Serverless.
+
+The frontend is deployed on Vercel, while the backend runs on Render.
+
+CivicPulse brings together technology, transparency, and civic participation to support smarter urban governance.
+
+CivicPulse V2 — making every civic issue count.
+
+Thank you."

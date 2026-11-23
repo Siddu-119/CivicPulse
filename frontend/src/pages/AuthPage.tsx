@@ -4,6 +4,7 @@ import {
   AlertCircle,
   Building,
   CheckCircle2,
+  Loader2,
   Lock,
   Mail,
   MapPin,
@@ -29,6 +30,21 @@ export function AuthPage() {
   const [ward, setWard] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [slowLoading, setSlowLoading] = useState(false);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    if (loading) {
+      timer = setTimeout(() => {
+        setSlowLoading(true);
+      }, 4000);
+    } else {
+      setSlowLoading(false);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [loading]);
 
   useEffect(() => {
     if (user) {
@@ -38,6 +54,7 @@ export function AuthPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setError('');
     setLoading(true);
     try {
@@ -56,10 +73,12 @@ export function AuthPage() {
       setError(err instanceof Error ? err.message : 'Authentication failed. Please verify credentials.');
     } finally {
       setLoading(false);
+      setSlowLoading(false);
     }
   };
 
   const fillDemo = (role: 'citizen' | 'admin') => {
+    if (loading) return;
     setMode('login');
     setError('');
     if (role === 'citizen') {
@@ -94,28 +113,32 @@ export function AuthPage() {
         <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl text-xs font-semibold">
           <button
             type="button"
+            disabled={loading}
             onClick={() => {
+              if (loading) return;
               setMode('login');
               setError('');
             }}
             className={`py-2 rounded-lg transition-all ${
               mode === 'login'
                 ? 'bg-white text-slate-950 shadow-xs'
-                : 'text-slate-500 hover:text-slate-900'
+                : 'text-slate-500 hover:text-slate-900 disabled:opacity-50'
             }`}
           >
             Sign In
           </button>
           <button
             type="button"
+            disabled={loading}
             onClick={() => {
+              if (loading) return;
               setMode('register');
               setError('');
             }}
             className={`py-2 rounded-lg transition-all ${
               mode === 'register'
                 ? 'bg-white text-slate-950 shadow-xs'
-                : 'text-slate-500 hover:text-slate-900'
+                : 'text-slate-500 hover:text-slate-900 disabled:opacity-50'
             }`}
           >
             Register
@@ -219,16 +242,36 @@ export function AuthPage() {
             </div>
           )}
 
+          {loading && slowLoading && (
+            <div className="p-3 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2">
+              <Loader2 className="w-4 h-4 shrink-0 text-amber-600 animate-spin mt-0.5" />
+              <span>
+                Connecting to the server... The service may take a little longer to wake up. Please wait.
+              </span>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 text-xs sm:text-sm font-bold text-white bg-slate-950 hover:bg-slate-800 rounded-xl shadow-md transition-all active:scale-98 disabled:opacity-50"
+            className="w-full py-3 text-xs sm:text-sm font-bold text-white bg-slate-950 hover:bg-slate-800 rounded-xl shadow-md transition-all active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {loading
-              ? 'Authenticating...'
-              : mode === 'login'
-              ? 'Sign In to Portal'
-              : 'Create Account'}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                <span>
+                  {slowLoading
+                    ? 'Waking up server...'
+                    : mode === 'login'
+                    ? 'Authenticating...'
+                    : 'Creating Account...'}
+                </span>
+              </>
+            ) : (
+              <span>
+                {mode === 'login' ? 'Sign In to Portal' : 'Create Account'}
+              </span>
+            )}
           </button>
         </form>
 
@@ -242,8 +285,9 @@ export function AuthPage() {
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
+              disabled={loading}
               onClick={() => fillDemo('citizen')}
-              className="p-2 text-left rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 transition-colors"
+              className="p-2 text-left rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 transition-colors disabled:opacity-50"
             >
               <span className="text-[11px] font-bold text-slate-900 block">Demo Citizen</span>
               <span className="text-[10px] text-slate-500 block truncate font-mono">
@@ -253,8 +297,9 @@ export function AuthPage() {
 
             <button
               type="button"
+              disabled={loading}
               onClick={() => fillDemo('admin')}
-              className="p-2 text-left rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 transition-colors"
+              className="p-2 text-left rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 transition-colors disabled:opacity-50"
             >
               <span className="text-[11px] font-bold text-cyan-900 block">Demo Admin</span>
               <span className="text-[10px] text-slate-500 block truncate font-mono">

@@ -259,7 +259,7 @@ Vite's development proxy (`vite.config.ts`) automatically forwards all `/api` an
 ## 8. Reviewer & Demo Credentials
 
 ### Live Web Application Access
-Open the live frontend application: [https://civic-pulse-ruby-nine.vercel.app/](https://civic-pulse-ruby-nine.vercel.app/)
+Open the live frontend application: [https://civicpulse-governance.vercel.app/](https://civicpulse-governance.vercel.app/)
 
 #### 1. Live Production Deployment Credentials
 | Role | Email | Password | Access Details |
@@ -410,6 +410,6 @@ dist/assets/index-DUMBN-hw.js   477.92 kB │ gzip: 138.51 kB
 - **Author / Lead Developer:** [Siddu (@Siddu-119)](https://github.com/Siddu-119)
 - **Source Repository:** [https://github.com/Siddu-119/CivicPulse](https://github.com/Siddu-119/CivicPulse)
 - **Deployment Environments:**
-  - **Frontend:** [https://civic-pulse-ruby-nine.vercel.app/](https://civic-pulse-ruby-nine.vercel.app/) (Vercel Free Tier)
+  - **Frontend:** [https://civicpulse-governance.vercel.app/](https://civicpulse-governance.vercel.app/) (Vercel Free Tier)
   - **Backend:** [https://civicpulse-backend-pill.onrender.com](https://civicpulse-backend-pill.onrender.com) (Render Free Web Service)
   - **Database:** TiDB Cloud Serverless (`ap-northeast-1` AWS Tokyo)
